@@ -9,13 +9,13 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.youtube.YouTube;
-import com.google.api.services.youtube.model.VideoListResponse;
+import com.google.api.services.youtube.model.PlaylistItem;
+import com.google.api.services.youtube.model.PlaylistItemListResponse;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 
 
 public class Main {
@@ -87,29 +87,13 @@ public class Main {
 		YouTube youtube = getYouTubeService();
 
 		try {
-			HashMap<String, String> parameters = new HashMap<>();
-			parameters.put("part", "snippet,contentDetails,statistics");
-			parameters.put("chart", "mostPopular");
-			parameters.put("regionCode", "US");
-			parameters.put("videoCategoryId", "");
-
-			YouTube.Videos.List videosListMostPopularRequest = youtube.videos().list(parameters.get("part").toString());
-			if (parameters.containsKey("chart") && parameters.get("chart") != "") {
-				videosListMostPopularRequest.setChart(parameters.get("chart").toString());
+			/*System.out.println(youtube.playlists().list("snippet")//.setChannelId("UCR-ENZ64WL1vB8KU4YzdmTQ")
+					.setId("PLru1HAOKPcjJQr4lsCh2eU9F2lhSX23F_").execute().getItems().get(0).);*/
+			//System.out.println(youtube.playlistItems().list("snippet").setPlaylistId("PLru1HAOKPcjJQr4lsCh2eU9F2lhSX23F_").execute());
+			PlaylistItemListResponse vids = youtube.playlistItems().list("snippet").setPlaylistId("PLru1HAOKPcjJQr4lsCh2eU9F2lhSX23F_").execute();
+			for (PlaylistItem item : vids.getItems()) {
+				System.out.println(item.getSnippet().getDescription());
 			}
-
-			if (parameters.containsKey("regionCode") && parameters.get("regionCode") != "") {
-				videosListMostPopularRequest.setRegionCode(parameters.get("regionCode").toString());
-			}
-
-			if (parameters.containsKey("videoCategoryId") && parameters.get("videoCategoryId") != "") {
-				videosListMostPopularRequest.setVideoCategoryId(parameters.get("videoCategoryId").toString());
-			}
-
-			VideoListResponse response = videosListMostPopularRequest.execute();
-			System.out.println(response);
-
-
 		} catch (GoogleJsonResponseException e) {
 			e.printStackTrace();
 			System.err.println("There was a service error: " + e.getDetails().getCode() + " : " + e.getDetails().getMessage());
