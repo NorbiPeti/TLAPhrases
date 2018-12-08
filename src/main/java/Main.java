@@ -16,14 +16,14 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class Main {
 
 	/** Application name. */
 	private static final String APPLICATION_NAME = "API Sample";
-
-	public static final String SEPARATOR_STR = "-------------------";
 
 	/** Global instance of the JSON factory. */
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -94,13 +94,19 @@ public class Main {
 				}
 			};
 			PlaylistItemListResponse vids = getReq.get().execute();
+			final Pattern pat = Pattern.compile("[-¡]{10,}\\n.*[Cc]omment.*\"(.+)\".*\\n[-¡]{10,}");
 			int C = 0, CV = 0;
 			do {
 				for (PlaylistItem item : vids.getItems()) {
 					CV++;
 					String desc = item.getSnippet().getDescription();
-					if (item.getSnippet().getTitle().contains("Rude - MAGIC!")) System.out.println(desc);
-					int ind = desc.indexOf(SEPARATOR_STR); //...TODO: Use regex (random char 173)
+					Matcher matcher = pat.matcher(desc);
+					if (!matcher.find()) continue;
+					System.out.println(matcher.group(1));
+					if (matcher.group(1).equals("I'm part of the Tiffamily!"))
+						System.out.println(item.getSnippet().getTitle());
+					/*if (item.getSnippet().getTitle().contains("Rude - MAGIC!")) System.out.println(desc);
+					int ind = desc.indexOf(SEPARATOR_STR);
 					int ind2 = desc.indexOf(SEPARATOR_STR, ind + SEPARATOR_STR.length());
 					if (item.getSnippet().getTitle().contains("Rude - MAGIC!")) {
 						System.out.println("Ind: " + ind + " " + ind2);
@@ -119,7 +125,7 @@ public class Main {
 					if (word.equals("Without Warning")) System.out.println(section);
 					if (word.equals("Teddy bears are my friends")) System.out.println(item.getSnippet().getTitle());
 					if (word.equals("#BuyLegacyOniTunes")) System.out.println(item.getSnippet().getTitle());
-					if (word.equals("HALO")) System.out.println(item.getSnippet().getTitle());
+					if (word.equals("HALO")) System.out.println(item.getSnippet().getTitle());*/
 					C++;
 				}
 				if (vids.getNextPageToken() == null) break;
