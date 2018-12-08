@@ -94,17 +94,25 @@ public class Main {
 				}
 			};
 			PlaylistItemListResponse vids = getReq.get().execute();
-			final Pattern pat = Pattern.compile("[-¡]{10,}\\n.*[Cc]omment.*\"(.+)\".*\\n[-¡]{10,}");
+			//final Pattern pat = Pattern.compile("[-\u00AD]{10,}\\n.*[Cc]omment.*\"(.+)\".*[^-]*[-\u00AD]{10,}");
+			final Pattern pat = Pattern.compile("[Cc]omment[,\\s.:]*[\"'“]((?:\\w|\\s|[^\"”.])+)[\"'”.]|\\(If you (?:read|see) this, comment: (.*)\\)");
 			int C = 0, CV = 0;
 			do {
 				for (PlaylistItem item : vids.getItems()) {
 					CV++;
 					String desc = item.getSnippet().getDescription();
 					Matcher matcher = pat.matcher(desc);
-					if (!matcher.find()) continue;
-					System.out.println(matcher.group(1));
-					if (matcher.group(1).equals("I'm part of the Tiffamily!"))
-						System.out.println(item.getSnippet().getTitle());
+					String phrase = null;
+					while (matcher.find()) { //There may be other "comment xy" messages but this should be always the last one
+						phrase = matcher.group(1);
+						if (phrase == null) phrase = matcher.group(2);
+						phrase = phrase.replace("\"", "").trim(); //Easier this way
+					}
+					if (phrase == null) {
+						//System.out.println("\n\n\n\n"+desc+"\n\n\n\n");
+						continue;
+					}
+					System.out.println(phrase + "\t" + item.getSnippet().getTitle());
 					/*if (item.getSnippet().getTitle().contains("Rude - MAGIC!")) System.out.println(desc);
 					int ind = desc.indexOf(SEPARATOR_STR);
 					int ind2 = desc.indexOf(SEPARATOR_STR, ind + SEPARATOR_STR.length());
