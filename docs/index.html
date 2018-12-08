@@ -1,0 +1,118 @@
+<html>
+<head>
+    <title>Guess the video!</title>
+    <style>
+		body {
+			background-color: #68caff;
+		}
+
+    </style>
+    <meta charset="UTF-8"/>
+    <script type="text/javascript">
+		async function getFile(reader){
+			let response = await fetch(document.URL.substr(0,document.URL.lastIndexOf('/'))+'/phrases.txt');
+			let data = await response.blob();
+			reader.readAsText(data);
+			/*let metadata = {
+				contentType: 'text/plain'
+			};
+			let file = new File([data], "phrases.txt", metadata);
+			return file;*/
+		}
+		
+		function getPhrase() {
+			good=Math.floor(Math.random() * data.length);
+			document.getElementById("phrase").innerText="\""+data[good][0]+"\"";
+			makeOptions();
+		}
+		
+		var data=[];
+		var good=-1;
+		var reader = new FileReader();
+		reader.onload = function(progressEvent){
+			// By lines
+			var lines = this.result.split('\n');
+			for(var i = 0; i < lines.length; i++){
+				var line = lines[i];
+				data[i] = line.split('\t');
+			}
+			getPhrase();
+		};
+		getFile(reader);
+	
+		function checkResp() {
+			var val=document.getElementById("response").value;
+			if(val<0) return;
+			console.log(data[val]);
+			document.getElementById("respyt").src="https://www.youtube.com/embed/"+data[val][2];
+			if(val==good) {
+				var res=document.getElementById("resultH");
+				res.innerText="Correct!";
+				res.style="color: #00AA00";
+				res=document.getElementById("resultP");
+				res.innerText="Your answer is correct!";
+				res.style="color: #00AA00";
+			}
+			else {
+				var res=document.getElementById("resultH");
+				res.innerText="Wrong!";
+				res.style="color: #AA0000";
+				res=document.getElementById("resultP");
+				res.innerText="The correct answer is: \""+data[good][1]+"\"";
+				res.style="color: #AA0000";
+				document.getElementById("goodyt").src="https://www.youtube.com/embed/"+data[good][2];
+				document.getElementById("goodBlock").style="display: block";
+			}
+			document.getElementById("respBlock").style="display: block";
+		}
+		
+		function reset() {
+			document.getElementById("response").innerHTML='<option value="-1" default>-- Choose a video --</option>';
+			document.getElementById("goodBlock").style="display: none";
+			document.getElementById("respBlock").style="display: none";
+			getPhrase();
+		}
+		
+		function makeOptions() {
+			for(var i = (good>=2?good-2:0); i < data.length&&i<good+2; i++) {
+				var opt=document.createElement("option");
+				opt.value=i;
+				opt.text=data[i][1];
+				var resp=document.getElementById("response");
+				resp.insertBefore(opt, resp.children[Math.floor(Math.random() * resp.children.length)]);
+			}
+		}
+
+    </script>
+</head>
+<body>
+<div style="max-width: 500px; margin: auto">
+    <h1>Guess the video!</h1>
+    <p>So you know those "info sections" in most of Tiffany's videos? Here you can see a word, phrase or sometimes a
+        sentence to comment on one of the videos. Can you guess which one it belongs to?</p>
+    <h3 id="phrase">Please enable JavaScript :P</h3>
+    <select id="response" style="max-width: 500px">
+        <option value="-1" default>-- Choose a video --</option>
+    </select>
+    <br>
+    <button onclick="checkResp()">Send</button>
+    <br>
+    <button onclick="reset()">Another one</button>
+    <div id="respBlock" style="display: none">
+        <h3 id="resultH"></h3>
+        <p id="resultP"></p>
+        <p>Your response:</p>
+        <iframe id="respyt" width="560" height="315" src="https://www.youtube.com/embed/" frameborder="0"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+    </div>
+    <div id="goodBlock" style="display: none">
+        <p>Correct video:</p>
+        <iframe id="goodyt" width="560" height="315" src="https://www.youtube.com/embed/" frameborder="0"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+    </div>
+</div>
+</body>
+</html>
+

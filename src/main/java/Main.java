@@ -87,8 +87,8 @@ public class Main {
 			final Supplier<YouTube.PlaylistItems.List> getReq = () ->
 			{
 				try {
-					return youtube.playlistItems().list("snippet").setPlaylistId("PLru1HAOKPcjJQr4lsCh2eU9F2lhSX23F_")
-							.setFields("items(id,snippet/title,snippet/description),nextPageToken").setMaxResults(50L);
+					return youtube.playlistItems().list("snippet,contentDetails").setPlaylistId("PLru1HAOKPcjJQr4lsCh2eU9F2lhSX23F_")
+							.setFields("items(contentDetails/videoId,snippet/title,snippet/description),nextPageToken").setMaxResults(50L);
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
@@ -112,7 +112,8 @@ public class Main {
 						//System.out.println("\n\n\n\n"+desc+"\n\n\n\n");
 						continue;
 					}
-					System.out.println(phrase + "\t" + item.getSnippet().getTitle());
+					//System.out.println(phrase + "\t" + item.getSnippet().getTitle()+"\t"+"https://www.youtube.com/watch?v="+item.getContentDetails().getVideoId());
+					System.out.println(phrase + "\t" + item.getSnippet().getTitle() + "\t" + item.getContentDetails().getVideoId());
 					/*if (item.getSnippet().getTitle().contains("Rude - MAGIC!")) System.out.println(desc);
 					int ind = desc.indexOf(SEPARATOR_STR);
 					int ind2 = desc.indexOf(SEPARATOR_STR, ind + SEPARATOR_STR.length());
