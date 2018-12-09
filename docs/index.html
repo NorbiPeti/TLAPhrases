@@ -1,14 +1,27 @@
 <html>
 <head>
     <title>Guess the video!</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <style>
 		body {
 			background-color: #68caff;
 		}
 
-    </style>
-    <meta charset="UTF-8"/>
-    <script type="text/javascript">
+		/*button {
+			background-color: #4C5FAA;
+			border: none;
+			color: white;
+			padding: 15px 32px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin: 4px 2px;
+			cursor: pointer;
+		}*/
+	</style>
+	<meta charset="UTF-8"/>
+	<script type="text/javascript">
 		async function getFile(reader){
 			let response = await fetch(document.URL.substr(0,document.URL.lastIndexOf('/'))+'/phrases.txt');
 			let data = await response.blob();
@@ -35,6 +48,7 @@
 			for(var i = 0; i < lines.length; i++){
 				var line = lines[i];
 				data[i] = line.split('\t');
+				if(data[i].length<3) data.splice(i, 1);
 			}
 			getPhrase();
 		};
@@ -43,7 +57,6 @@
 		function checkResp() {
 			var val=document.getElementById("response").value;
 			if(val<0) return;
-			document.getElementById("sendbtn").disabled=true;
 			console.log(data[val]);
 			document.getElementById("respyt").src="https://www.youtube.com/embed/"+data[val][2];
 			if(val==good) {
@@ -74,13 +87,16 @@
 				document.getElementById("score").innerText--;
 			}
 			document.getElementById("respBlock").style="display: block";
+			document.getElementById("sendbtn").style="display: none";
+			document.getElementById("anotherbtn").style="";
 		}
 		
 		function reset() {
 			document.getElementById("response").innerHTML='<option value="-1" default>-- Choose a video --</option>';
 			document.getElementById("goodBlock").style="display: none";
 			document.getElementById("respBlock").style="display: none";
-			document.getElementById("sendbtn").disabled=false;
+			document.getElementById("sendbtn").style="";
+			document.getElementById("anotherbtn").style="display: none";
 			getPhrase();
 		}
 		
@@ -108,8 +124,7 @@
     </select>
     <br>
     <button onclick="checkResp()" id="sendbtn">Send</button>
-    <br>
-    <button onclick="reset()">Another one</button>
+    <button onclick="reset()" id="anotherbtn" style="display: none">Another one</button>
     <div id="respBlock" style="display: none">
         <h3 id="resultH"></h3>
         <p id="resultP"></p>
