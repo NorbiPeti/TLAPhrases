@@ -22,6 +22,7 @@
 	</style>
 	<meta charset="UTF-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta http-equiv="Cache-Control" content="no-store" />
 	<script type="text/javascript">
 		async function getFile(reader){
 			let response = await fetch(document.URL.substr(0,document.URL.lastIndexOf('/'))+'/phrases.txt');
@@ -37,9 +38,11 @@
 		
 		var data=[];
 		var good=-1;
-		var loaded=false;	//For some reason previously loaded videos are kept so loading takes some time
+		var loaded=false;	//Because of caching, previously loaded videos are kept so loading takes some time
 		function doLoad() {
 			if(loaded) return;
+			if(document.getElementById("response")==null
+				|| document.getElementById("phrase")==null) return;
 			loaded=true;
 			var reader = new FileReader();
 			reader.onload = function(progressEvent){
@@ -50,6 +53,25 @@
 					data[i] = line.split('\t');
 					if(data[i].length<3) data.splice(i, 1);
 				}
+
+				var ifr=document.createElement("iframe"); //Create dynamically to prevent caching
+				ifr.id="respyt";
+				ifr.width=496;
+				ifr.height=279;
+				ifr.frameborder=0;
+				ifr.allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
+				ifr.allowfullscreen=true;
+				document.getElementById("respBlock").appendChild(ifr);
+
+				ifr=document.createElement("iframe"); //Create dynamically to prevent caching
+				ifr.id="goodyt";
+				ifr.width=496;
+				ifr.height=279;
+				ifr.frameborder=0;
+				ifr.allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
+				ifr.allowfullscreen=true;
+				document.getElementById("goodBlock").appendChild(ifr);
+
 				getPhrase();
 			};
 			getFile(reader);
@@ -132,15 +154,9 @@
         <h3 id="resultH"></h3>
         <p id="resultP"></p>
         <p>Your response:</p>
-        <iframe id="respyt" width="496" height="279" src="about:blank" frameborder="0"
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen></iframe>
     </div>
     <div id="goodBlock" style="display: none">
         <p>Correct video:</p>
-        <iframe id="goodyt" width="496" height="279" src="about:blank" frameborder="0"
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen></iframe>
     </div>
 </div>
 </body>
