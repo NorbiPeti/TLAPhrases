@@ -37,19 +37,26 @@
 		
 		var data=[];
 		var good=-1;
-		var reader = new FileReader();
-		reader.onload = function(progressEvent){
-			// By lines
-			var lines = this.result.split('\n');
-			for(var i = 0; i < lines.length; i++){
-				var line = lines[i];
-				data[i] = line.split('\t');
-				if(data[i].length<3) data.splice(i, 1);
-			}
-			getPhrase();
-		};
-		getFile(reader);
-	
+		var loaded=false;	//For some reason previously loaded videos are kept so loading takes some time
+		function doLoad() {
+			if(loaded) return;
+			loaded=true;
+			var reader = new FileReader();
+			reader.onload = function(progressEvent){
+				// By lines
+				var lines = this.result.split('\n');
+				for(var i = 0; i < lines.length; i++){
+					var line = lines[i];
+					data[i] = line.split('\t');
+					if(data[i].length<3) data.splice(i, 1);
+				}
+				getPhrase();
+			};
+			getFile(reader);
+		}
+		window.onload = ()=>doLoad();
+		doLoad();			//So let's try loading ASAP, and if that fails then wait for the load event
+
 		function checkResp() {
 			var val=document.getElementById("response").value;
 			if(val<0) return;
@@ -114,7 +121,7 @@
     <p>So you know those "info sections" in most of Tiffany's videos? Here you can see a word, phrase or sometimes a
         sentence to comment on one of the videos. Can you guess which video it belongs to?</p>
     <h4>Score: <span id="score">20</span></h4>
-    <h3 id="phrase">Please enable JavaScript :P</h3>
+    <h3 id="phrase">Please enable JavaScript or wait :P</h3>
     <select id="response" style="max-width: 500px">
         <option value="-1" default>-- Choose a video --</option>
     </select>
@@ -125,13 +132,13 @@
         <h3 id="resultH"></h3>
         <p id="resultP"></p>
         <p>Your response:</p>
-        <iframe id="respyt" width="496" height="279" src="https://www.youtube.com/embed/" frameborder="0"
+        <iframe id="respyt" width="496" height="279" src="about:blank" frameborder="0"
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen></iframe>
     </div>
     <div id="goodBlock" style="display: none">
         <p>Correct video:</p>
-        <iframe id="goodyt" width="496" height="279" src="https://www.youtube.com/embed/" frameborder="0"
+        <iframe id="goodyt" width="496" height="279" src="about:blank" frameborder="0"
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen></iframe>
     </div>
