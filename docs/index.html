@@ -43,6 +43,7 @@
 		function checkResp() {
 			var val=document.getElementById("response").value;
 			if(val<0) return;
+			document.getElementById("sendbtn").disabled=true;
 			console.log(data[val]);
 			document.getElementById("respyt").src="https://www.youtube.com/embed/"+data[val][2];
 			if(val==good) {
@@ -50,18 +51,27 @@
 				res.innerText="Correct!";
 				res.style="color: #00AA00";
 				res=document.getElementById("resultP");
-				res.innerText="Your answer is correct!";
+				res.innerHTML="Your answer is correct!<br>You can watch the video below:";
 				res.style="color: #00AA00";
+				
+				document.getElementById("score").innerText++;
+				document.getElementById("score").innerText++;
+				document.getElementById("score").innerText++;
+				document.getElementById("score").innerText++; //Heh - fixes casting problems
 			}
 			else {
 				var res=document.getElementById("resultH");
 				res.innerText="Wrong!";
 				res.style="color: #AA0000";
 				res=document.getElementById("resultP");
-				res.innerText="The correct answer is: \""+data[good][1]+"\"";
+				res.innerHTML="The correct answer is: \""+data[good][1]+"\"<br>"
+				+ "You can watch both of the videos below:";
 				res.style="color: #AA0000";
 				document.getElementById("goodyt").src="https://www.youtube.com/embed/"+data[good][2];
 				document.getElementById("goodBlock").style="display: block";
+				
+				document.getElementById("score").innerText--;
+				document.getElementById("score").innerText--;
 			}
 			document.getElementById("respBlock").style="display: block";
 		}
@@ -70,6 +80,7 @@
 			document.getElementById("response").innerHTML='<option value="-1" default>-- Choose a video --</option>';
 			document.getElementById("goodBlock").style="display: none";
 			document.getElementById("respBlock").style="display: none";
+			document.getElementById("sendbtn").disabled=false;
 			getPhrase();
 		}
 		
@@ -89,13 +100,14 @@
 <div style="max-width: 500px; margin: auto">
     <h1>Guess the video!</h1>
     <p>So you know those "info sections" in most of Tiffany's videos? Here you can see a word, phrase or sometimes a
-        sentence to comment on one of the videos. Can you guess which one it belongs to?</p>
+        sentence to comment on one of the videos. Can you guess which video it belongs to?</p>
+    <h4>Score: <span id="score">20</span></h4>
     <h3 id="phrase">Please enable JavaScript :P</h3>
     <select id="response" style="max-width: 500px">
         <option value="-1" default>-- Choose a video --</option>
     </select>
     <br>
-    <button onclick="checkResp()">Send</button>
+    <button onclick="checkResp()" id="sendbtn">Send</button>
     <br>
     <button onclick="reset()">Another one</button>
     <div id="respBlock" style="display: none">
