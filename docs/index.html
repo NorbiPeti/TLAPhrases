@@ -21,16 +21,12 @@
 		}*/
 	</style>
 	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<script type="text/javascript">
 		async function getFile(reader){
 			let response = await fetch(document.URL.substr(0,document.URL.lastIndexOf('/'))+'/phrases.txt');
 			let data = await response.blob();
 			reader.readAsText(data);
-			/*let metadata = {
-				contentType: 'text/plain'
-			};
-			let file = new File([data], "phrases.txt", metadata);
-			return file;*/
 		}
 		
 		function getPhrase() {
