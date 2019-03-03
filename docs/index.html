@@ -1,8 +1,8 @@
 <html>
 <head>
-    <title>Guess the video!</title>
+	<title>Guess the video!</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <style>
+	<style>
 		body {
 			background-color: #68caff;
 		}
@@ -25,20 +25,20 @@
 	<meta http-equiv="Cache-Control" content="no-store" />
 	<script type="text/javascript">
 		async function getFile(reader){
-			let response = await fetch(document.URL.substr(0,document.URL.lastIndexOf('/'))+'/phrases.txt');
+			let response = await fetch(document.URL.substr(0,document.URL.lastIndexOf('/'))+'/phrases.tsv');
 			let data = await response.blob();
 			reader.readAsText(data);
 		}
-		
+
 		function getPhrase() {
 			good=Math.floor(Math.random() * data.length);
 			document.getElementById("phrase").innerText="\""+data[good][0]+"\"";
 			makeOptions();
 		}
-		
+
 		var data=[];
 		var good=-1;
-		var loaded=false;	//Because of caching, previously loaded videos are kept so loading takes some time
+		var loaded=false;	//Because of caching, previously loaded videos are kept so loading takes some time - no longer the case
 		function doLoad() {
 			if(loaded) return;
 			if(document.getElementById("response")==null
@@ -54,24 +54,6 @@
 					if(data[i].length<3) data.splice(i, 1);
 				}
 
-				var ifr=document.createElement("iframe"); //Create dynamically to prevent caching
-				ifr.id="respyt";
-				ifr.width=496;
-				ifr.height=279;
-				ifr.frameborder=0;
-				ifr.allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
-				ifr.allowfullscreen=true;
-				document.getElementById("respBlock").appendChild(ifr);
-
-				ifr=document.createElement("iframe"); //Create dynamically to prevent caching
-				ifr.id="goodyt";
-				ifr.width=496;
-				ifr.height=279;
-				ifr.frameborder=0;
-				ifr.allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
-				ifr.allowfullscreen=true;
-				document.getElementById("goodBlock").appendChild(ifr);
-
 				getPhrase();
 			};
 			getFile(reader);
@@ -79,52 +61,75 @@
 		window.onload = ()=>doLoad();
 		doLoad();			//So let's try loading ASAP, and if that fails then wait for the load event
 
+		/**
+		 * Creates iframe and displays container div.
+		 * @param videoID YouTube video ID
+		 * @param blockID Container div ID
+		 * @param iframeID Created Iframe ID
+		 */
+		function createIframe(videoID, blockID, iframeID) { //Create iframes each time so it's not recorded in history
+			const ifr = document.createElement("iframe"); //Create dynamically to prevent caching
+			ifr.id=iframeID;
+			ifr.width=496;
+			ifr.height=279;
+			ifr.frameborder=0;
+			ifr.allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
+			ifr.allowfullscreen=true;
+			ifr.src="https://www.youtube.com/embed/"+videoID;
+			const block=document.getElementById(blockID);
+			block.appendChild(ifr);
+			block.style.display="block";
+		}
+
 		function checkResp() {
-			var val=document.getElementById("response").value;
+			const val = document.getElementById("response").value;
 			if(val<0) return;
 			console.log(data[val]);
-			document.getElementById("respyt").src="https://www.youtube.com/embed/"+data[val][2];
-			if(val==good) {
-				var res=document.getElementById("resultH");
+			createIframe(data[val][2], "respBlock", "respyt");
+			let res;
+			if(Number(val)===good) {
+				res=document.getElementById("resultH");
 				res.innerText="Correct!";
-				res.style="color: #00AA00";
+				res.style.color="#00AA00";
 				res=document.getElementById("resultP");
 				res.innerHTML="Your answer is correct!<br>You can watch the video below:";
-				res.style="color: #00AA00";
-				
+				res.style.color="#00AA00";
+
 				document.getElementById("score").innerText++;
 				document.getElementById("score").innerText++;
 				document.getElementById("score").innerText++;
 				document.getElementById("score").innerText++; //Heh - fixes casting problems
 			}
 			else {
-				var res=document.getElementById("resultH");
+				res=document.getElementById("resultH");
 				res.innerText="Wrong!";
-				res.style="color: #AA0000";
+				res.style.color="#AA0000";
 				res=document.getElementById("resultP");
 				res.innerHTML="The correct answer is: \""+data[good][1]+"\"<br>"
-				+ "You can watch both of the videos below:";
-				res.style="color: #AA0000";
-				document.getElementById("goodyt").src="https://www.youtube.com/embed/"+data[good][2];
-				document.getElementById("goodBlock").style="display: block";
-				
+					+ "You can watch both of the videos below:";
+				res.style.color="#AA0000";
+				createIframe(data[good][2], "goodBlock", "goodyt");
+
 				document.getElementById("score").innerText--;
 				document.getElementById("score").innerText--;
 			}
-			document.getElementById("respBlock").style="display: block";
-			document.getElementById("sendbtn").style="display: none";
-			document.getElementById("anotherbtn").style="";
+			document.getElementById("sendbtn").style.display="none";
+			document.getElementById("anotherbtn").style.cssText="";
 		}
-		
+
 		function reset() {
 			document.getElementById("response").innerHTML='<option value="-1" default>-- Choose a video --</option>';
-			document.getElementById("goodBlock").style="display: none";
-			document.getElementById("respBlock").style="display: none";
-			document.getElementById("sendbtn").style="";
-			document.getElementById("anotherbtn").style="display: none";
+			document.getElementById("goodBlock").style.display="none";
+			document.getElementById("respBlock").style.display="none";
+			document.getElementById("respyt").remove();
+			const goodyt=document.getElementById("goodyt");
+			if(goodyt)
+				goodyt.remove();
+			document.getElementById("sendbtn").style.cssText="";
+			document.getElementById("anotherbtn").style.cssText="display: none";
 			getPhrase();
 		}
-		
+
 		function makeOptions() {
 			for(var i = (good>=2?good-2:0); i < data.length&&i<good+2; i++) {
 				var opt=document.createElement("option");
@@ -135,29 +140,29 @@
 			}
 		}
 
-    </script>
+	</script>
 </head>
 <body>
 <div style="max-width: 500px; margin: auto">
-    <h1>Guess the video!</h1>
-    <p>So you know those "info sections" in most of Tiffany's videos? Here you can see a word, phrase or sometimes a
-        sentence to comment on one of the videos. Can you guess which video it belongs to?</p>
-    <h4>Score: <span id="score">20</span></h4>
-    <h3 id="phrase">Please enable JavaScript or wait :P</h3>
-    <select id="response" style="max-width: 500px">
-        <option value="-1" default>-- Choose a video --</option>
-    </select>
-    <br>
-    <button onclick="checkResp()" id="sendbtn">Send</button>
-    <button onclick="reset()" id="anotherbtn" style="display: none">Another one</button>
-    <div id="respBlock" style="display: none">
-        <h3 id="resultH"></h3>
-        <p id="resultP"></p>
-        <p>Your response:</p>
-    </div>
-    <div id="goodBlock" style="display: none">
-        <p>Correct video:</p>
-    </div>
+	<h1>Guess the video!</h1>
+	<p>So you know those "info sections" in most of Tiffany's videos? Here you can see a word, phrase or sometimes a
+		sentence to comment on one of the videos. Can you guess which video it belongs to?</p>
+	<h4>Score: <span id="score">20</span></h4>
+	<h3 id="phrase">Please enable JavaScript or wait :P</h3>
+	<select id="response" style="max-width: 500px">
+		<option value="-1" default>-- Choose a video --</option>
+	</select>
+	<br>
+	<button onclick="checkResp()" id="sendbtn">Send</button>
+	<button onclick="reset()" id="anotherbtn" style="display: none">Another one</button>
+	<div id="respBlock" style="display: none">
+		<h3 id="resultH"></h3>
+		<p id="resultP"></p>
+		<p>Your response:</p>
+	</div>
+	<div id="goodBlock" style="display: none">
+		<p>Correct video:</p>
+	</div>
 </div>
 </body>
 </html>
