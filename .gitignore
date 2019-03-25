@@ -1,5 +1,5 @@
 target/
 .idea/
-client_secret.*
+client_secret*
 .*
 

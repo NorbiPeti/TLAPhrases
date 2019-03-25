@@ -51,6 +51,8 @@
 				for(var i = 0; i < lines.length; i++){
 					var line = lines[i];
 					data[i] = line.split('\t');
+					for(var j = 0; j < data[i].length; j++)
+						data[i][j] = data[i][j].replace(/\\"/g, "\"");
 					if(data[i].length<3) data.splice(i, 1);
 				}
 
